@@ -1,0 +1,23 @@
+pip install kaggle
+
+
+Go to the kaggle website.
+
+Click on Your profile button on the top right and then select My Account.
+
+Scroll down to the API section and click on the Create New API Token button.
+
+It will initiate the download of a file call kaggle.json. Save the file at a known location on your machine.
+
+
+Move the downloaded file to a location ~/.kaggle/kaggle.json. If you don’t have the .kaggle folder in your home directory, you can create one using the command:
+mkdir ~/.kaggle
+
+Now move the downloaded file to this location using:
+mv <location>/kaggle.json ~/.kaggle/kaggle.json
+
+You need to give proper permissions to the file (since this is a hidden folder):
+chmod 600 ~/.kaggle/kaggle.json
+
+
+Run the command 'kaggle competitions list'.
