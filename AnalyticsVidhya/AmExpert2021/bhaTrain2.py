@@ -12,8 +12,13 @@ from torch.functional import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
+
+from sklearn.metrics import accuracy_score
+
+from tqdm import tqdm
 
 class bhaModel(nn.Module):
     def __init__(self,inShape,outShape):
@@ -57,19 +62,11 @@ class bhaDataset(Dataset):
         #print('Target',target.values)
 
         sample = {
-            'data' : torch.tensor(data.values),
-            'target' : torch.tensor(target.values)
+            'data' : torch.tensor(data.values,dtype=torch.float32),
+            'target' : torch.tensor(target.values,dtype=torch.float32)
         }
 
         return sample
-
-def bha_loss_fn(output,target):
-    tempSum = 0
-    #print('outputTensor',output)
-    #print(len(output))
-    for i in range(len(output)):
-        tempSum += nn.CrossEntropyLoss()(output[i], target[i])
-    return tempSum/len(output)
 
 
 if __name__=='__main__':
@@ -83,10 +80,10 @@ if __name__=='__main__':
     
     Tensor_dataset = bhaDataset(df)
     
-    print('Sample Dataset')
-    print(Tensor_dataset[0])
+    #print('Sample Dataset')
+    #print(Tensor_dataset[0])
 
-    dataloader = DataLoader(Tensor_dataset, batch_size=4, shuffle=True, num_workers=2)
+    bhaDataloader = DataLoader(Tensor_dataset, batch_size=10, shuffle=True, num_workers=4)
 
     """
     # Testing of Dataloader
@@ -96,4 +93,45 @@ if __name__=='__main__':
         if i_batch == 2:
             break
     """
-    print(bha_loss_fn(Tensor_dataset[0]['target'],Tensor_dataset[0]['target']))
+    #from sklearn.metrics import accuracy_score
+    #print(accuracy_score(Tensor_dataset[0]['target'],Tensor_dataset[1]['target']))
+    #print(bha_loss_fn(Tensor_dataset[0]['target'],Tensor_dataset[0]['target']))
+
+    """
+    loss = nn.CrossEntropyLoss()
+    input = torch.randn(3, 5, requires_grad=True)
+    target = torch.empty(3, dtype=torch.long).random_(5)
+    print('Input',input)
+    print('Target',target)
+    print('Error Result',loss(input,target))
+    """
+
+    model = bhaModel(inShape=df.shape[1]-len(TargetCol),outShape=len(TargetCol))
+
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    epochs = 10
+    # load the model on to the computation device
+    model.to(device)
+
+    #criterion = accuracy_score
+    criterion = nn.CrossEntropyLoss()
+
+    for epoch in range(epochs):
+        running_loss = 0.0
+
+        for i,data in enumerate(bhaDataloader,0):
+            inputs, labels = data['data'],data['target']
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs,labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+            if i % 200 == 199:
+                #print('Epoch :',epoch+1,'items: ',i+1,'Loss',running_loss/200)
+                print('Epoch: %d Items: %5d Loss: %.5f '%(epoch+1,i+1,running_loss/200.00))
+                running_loss = 0.0
