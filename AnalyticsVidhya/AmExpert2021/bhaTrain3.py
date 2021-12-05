@@ -4,19 +4,14 @@
 
 import numpy as np
 import pandas as pd
-from sklearn import metrics
-from sklearn.model_selection import train_test_split
 
 import torch
-#from torch.functional import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
-
-from sklearn.metrics import accuracy_score
 
 from tqdm import tqdm
 
@@ -85,27 +80,6 @@ if __name__=='__main__':
 
     bhaDataloader = DataLoader(Tensor_dataset, batch_size=1, shuffle=True, num_workers=1)
 
-    """
-    # Testing of Dataloader
-    print('Dataloader')
-    for i_batch, sample_batched in enumerate(dataloader):
-        print(i_batch, sample_batched['data'].size(),sample_batched['target'].size())
-        if i_batch == 2:
-            break
-    """
-    #from sklearn.metrics import accuracy_score
-    #print(accuracy_score(Tensor_dataset[0]['target'],Tensor_dataset[1]['target']))
-    #print(bha_loss_fn(Tensor_dataset[0]['target'],Tensor_dataset[0]['target']))
-
-    """
-    loss = nn.CrossEntropyLoss()
-    input = torch.randn(3, 5, requires_grad=True)
-    target = torch.empty(3, dtype=torch.long).random_(5)
-    print('Input',input)
-    print('Target',target)
-    print('Error Result',loss(input,target))
-    """
-
     model = bhaModel(inShape=df.shape[1]-len(TargetCol),outShape=len(TargetCol))
 
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
@@ -114,7 +88,6 @@ if __name__=='__main__':
     # load the model on to the computation device
     model.to(device)
 
-    #criterion = accuracy_score
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(epochs):

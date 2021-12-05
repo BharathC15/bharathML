@@ -31,6 +31,7 @@ for i in testData['Product_Holding_B1']:
         uniqueProduct.append(j)
 uniqueProduct = list(set(uniqueProduct))
 print('Unique B1 :',uniqueProduct)
+print(' No of unique :',len(uniqueProduct))
 
 # %%
 print(testData.head())
