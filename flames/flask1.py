@@ -1,5 +1,6 @@
-from flask import Flask, redirect, url_for, request
+# https://www.geeksforgeeks.org/flask-creating-first-simple-application/
 
+from flask import Flask, redirect, url_for, request
 
 app = Flask(__name__)
 
